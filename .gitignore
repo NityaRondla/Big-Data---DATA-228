@@ -1,0 +1,28 @@
+# Ignore Python cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Ignore virtual environments
+.venv/
+env/
+ENV/
+.venv.bak/
+*.env
+
+# Ignore data files
+*.csv
+*.tsv
+*.xlsx
+*.xls
+*.json
+*.parquet
+
+# Ignore Jupyter checkpoints
+.ipynb_checkpoints/
+
+# OS and IDE files
+.DS_Store
+*.log
+.vscode/
+.idea/
