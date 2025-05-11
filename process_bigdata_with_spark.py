@@ -11,7 +11,7 @@ stopwords = set([
     "an", "this", "that", "i", "you", "we", "from", "as", "it", "be", "are", "or"
 ])
 
-# Start Spark session
+# Spark session
 spark = SparkSession.builder \
     .appName("Keyword Comparison Visualization") \
     .config("spark.driver.bindAddress", "127.0.0.1") \
@@ -29,15 +29,18 @@ jd_words = df_jd.select(explode(split(lower(col("Job Description")), "\\W+")).al
 resume_keywords = resume_words.groupBy("word").count().orderBy(col("count").desc())
 jd_keywords = jd_words.groupBy("word").count().orderBy(col("count").desc())
 
-# Convert to pandas
-df_resume_keywords = resume_keywords.filter(~col("word").isin(stopwords)).limit(20).toPandas()
-df_jd_keywords = jd_keywords.filter(~col("word").isin(stopwords)).limit(20).toPandas()
+# Filter stopwords and save top 20 in Parquet
+resume_keywords.filter(~col("word").isin(stopwords)).limit(20) \
+    .write.mode("overwrite").parquet("Outputs/Resume_Top_Keywords.parquet")
 
-# Save if needed
-df_resume_keywords.to_csv("Outputs/Resume_Top_Keywords.csv", index=False)
-df_jd_keywords.to_csv("Outputs/JD_Top_Keywords.csv", index=False)
+jd_keywords.filter(~col("word").isin(stopwords)).limit(20) \
+    .write.mode("overwrite").parquet("Outputs/JD_Top_Keywords.parquet")
 
-# 📊 BAR PLOT - Top Keywords
+# Convert for plotting in Pandas:
+df_resume_keywords = spark.read.parquet("Outputs/Resume_Top_Keywords.parquet").toPandas()
+df_jd_keywords = spark.read.parquet("Outputs/JD_Top_Keywords.parquet").toPandas()
+
+# BAR PLOT - Top Keywords
 plt.figure(figsize=(14, 6))
 plt.subplot(1, 2, 1)
 sns.barplot(data=df_resume_keywords, x="count", y="word", palette="Blues_d")
@@ -53,7 +56,7 @@ plt.tight_layout()
 plt.savefig("Outputs/Top_Keywords_Barplot.png")
 plt.show()
 
-# 🔄 VENN DIAGRAM - Overlap
+# VENN DIAGRAM - Overlap
 resume_set = set(df_resume_keywords["word"])
 jd_set = set(df_jd_keywords["word"])
 
@@ -63,7 +66,7 @@ plt.title("Keyword Overlap (Top 20)")
 plt.savefig("Outputs/Keyword_Venn.png")
 plt.show()
 
-# 🔥 Optionally: HEATMAP of top overlapping terms
+# HEATMAP of top overlapping terms
 common = list(resume_set & jd_set)
 resume_common = df_resume_keywords[df_resume_keywords["word"].isin(common)].set_index("word")
 jd_common = df_jd_keywords[df_jd_keywords["word"].isin(common)].set_index("word")
@@ -79,4 +82,4 @@ plt.savefig("Outputs/Common_Keywords_Heatmap.png")
 plt.show()
 
 spark.stop()
-print("✅ All visualizations completed and saved in 'Outputs/'")
+print(" All visualizations completed and saved in 'Outputs/'")
