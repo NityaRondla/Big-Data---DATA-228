@@ -42,22 +42,32 @@
 
 ```
 Resume-Matcher/
-├── app.py
-├── requirements.txt
-├── README.md
+├── Assets/
 ├── Data/
-│   └── Raw/
-│       ├── UpdatedResumeDataSet.csv
-│       └── JobDescriptions.csv
-├── scripts/
-│   ├── similarity/
-│   │   └── get_score.py
-│   └── utils/
-│       ├── get_filenames_from_dir.py
-│       └── logger.py
-└── Assets/
-    └── img/
-        └── favicon.ico
+│   ├── Big/
+│   │   ├── BigJobDescriptions.csv
+│   │   └── BigResumeData.csv
+│   ├── Processed/
+│   ├── Raw/
+│   └── Demo/
+├── Outputs/
+│   ├── Common_Keywords_Heatmap.png
+│   ├── Keyword_Venn.png
+│   ├── Top_Keywords_Barplot.png
+│   ├── Resume_Top_Keywords.parquet
+│   └── JD_Top_Keywords.parquet
+├── resume_matcher/
+│   ├── dataextractor/
+│   ├── scripts/
+│   └── main.py
+├── KeyTermExtractor.py
+├── cleaner.py
+├── process_bigdata_with_spark.py
+├── streamlit_app.py
+├── TextCleaner.py
+├── app.log
+├── .gitignore
+└── README.md
 ```
 
 ---
